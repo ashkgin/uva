@@ -1,0 +1,11 @@
+vc/.vs/*
+vc/Debug/*
+vc/*/*/Debug/*
+vc/*/Debug/*
+vc/*/*/*.user
+vc/*/*.user
+vc/*.user
+bfs/*/*.pdf
+vc/*/*/*.txt
+vc/*/*.txt
+vc/*.txt
