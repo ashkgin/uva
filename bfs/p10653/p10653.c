@@ -3,6 +3,7 @@
 Author : Ashwani Kumar Gupta
 Date   : 2019/04/18
 Problem: uva p10653
+Algo   : BFS
 
 ******************************************************************/
 
@@ -18,10 +19,10 @@ Problem: uva p10653
 #define MAX_R                   1000
 #define MAX_C                   1000
 
-#define MAX_NODES				30
+#define MAX_NODES               30
 
 #define WHITE                   0
-#define GREY                    1
+#define GRAY                    1
 #define BLACK                   2
 
 typedef struct NODE {
@@ -46,7 +47,7 @@ void pushQ(int depth, tNODE *pEle)
 {
     if (pEle->color == WHITE)
     {
-        pEle->color = GREY;
+        pEle->color = GRAY;
         pEle->depth = depth;
         *pQW = pEle;
         pQW++;

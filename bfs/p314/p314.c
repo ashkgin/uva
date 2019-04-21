@@ -3,6 +3,7 @@
 Author : Ashwani Kumar Gupta
 Date   : 2019/04/19
 Problem: uva p314
+Algo   : BFS
 
 ******************************************************************/
 
@@ -21,7 +22,7 @@ Problem: uva p314
 #define MAX_NODES               30
 
 #define WHITE                   0
-#define GREY                    1
+#define GRAY                    1
 #define BLACK                   2
 
 #define EAST                    0
@@ -70,7 +71,7 @@ void pushQ(int depth, tNODE *pEle)
 {
     if (pEle->color == WHITE)
     {
-        pEle->color = GREY;
+        pEle->color = GRAY;
         pEle->depth = depth;
         *pQW = pEle;
         pQW++;
