@@ -16,7 +16,7 @@ Algo   : BFS
 #include <math.h>
 
 
-#define MAX_NODES               30
+#define MAX_NODES               100   //with 30 submission is not accepted at uva
 
 #define WHITE                   0
 #define GRAY                    1
