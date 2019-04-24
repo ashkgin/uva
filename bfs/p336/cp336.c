@@ -3,7 +3,7 @@
 Author : Ashwani Kumar Gupta
 Date   : 2019/04/19
 Problem: uva p336
-Algo   : BFS
+Algo   : BFS + HASH Table
 
 ******************************************************************/
 
@@ -16,35 +16,36 @@ Algo   : BFS
 #include <math.h>
 
 
-#define MAX_NODES               30
+#define MAX_NODES               100
 
-#define WHITE                   0
+#define WHITE                   -1
 #define GRAY                    1
-#define BLACK                   2
+#define PRIME                   31
+
+int curNodeCnt;
 
 typedef struct NODE {
     int id;
-    int ticks;
     int color;
     int cntLink;
     struct NODE *links[MAX_NODES];
+    struct NODE *hashNext;
 }tNODE;
 
 tNODE nodes[MAX_NODES];
 tNODE *que[MAX_NODES];
 
+tNODE *searchQue[PRIME];
+
 tNODE **pQR, **pQW;
 
-tNODE *pRoot;
-
-void initQ()
+static void initQ()
 {
     int i;
 
     //reset connections
-    for (i = 0; i < MAX_NODES; i++)
+    for (i = 0; i < curNodeCnt; i++)
     {
-        nodes[i].ticks = -1;
         nodes[i].color = WHITE;
     }
 
@@ -52,18 +53,14 @@ void initQ()
     pQW = &que[0];
 }
 
-void pushQ(int ticks, tNODE *pEle)
+static void pushQ(int ticks, tNODE *pEle)
 {
-    if (pEle->color == WHITE)
-    {
-        pEle->color = GRAY;
-        pEle->ticks = ticks;
+        pEle->color = ticks;
         *pQW = pEle;
         pQW++;
-    }
 }
 
-tNODE *popQ()
+static tNODE *popQ()
 {
     tNODE *pRes = 0;
 
@@ -71,104 +68,180 @@ tNODE *popQ()
     {
         pRes = *pQR;
         pQR++;
-        pRes->color = BLACK;
     }
 
     return pRes;
 }
 
-tNODE *searchNode(int id)
+static tNODE *searchNode(int id)
 {
     tNODE *pRes = 0;
-    int i = 0;
+    tNODE *pT;
+    int rem;
 
-    while (nodes[i].id != -1)
+    rem = id % PRIME;
+
+    if (searchQue[rem] == 0)
     {
-        if (nodes[i].id == id)
-        {
-            break;
-        }
-        i++;
+        pT = &nodes[curNodeCnt++];
+        pT->id = id;
+        pT->cntLink = 0;
+        pT->hashNext = 0;
+        searchQue[rem] = pT;
+        return pT;
     }
-    nodes[i].id = id;
+    else
+    {
+        pT = searchQue[rem];
+        while (pT->id != id)
+        {
+            if (pT->hashNext == 0)
+            {
+                pT->hashNext = &nodes[curNodeCnt++];
+                pT = pT->hashNext;
+                pT->id = id;
+                pT->cntLink = 0;
+                pT->hashNext = 0;
+                return pT;
+            }
+            else
+            {
+                pT = pT->hashNext;
+            }
+        }
 
-    pRes = &nodes[i];
+        return pT;
+
+    }
+
 
     return pRes;
 }
 
-tNODE *searchNodeForPush(int id)
+static tNODE *searchNodeForPush(int id)
 {
     tNODE *pRes = 0;
-    int i = 0;
+    tNODE *pT;
+    int rem;
 
-    while (nodes[i].id != -1)
-    {
-        if (nodes[i].id == id)
+    rem = id % PRIME;
+
+        pT = searchQue[rem];
+        while (pT && pT->id != id)
         {
-            pRes = &nodes[i];
-            break;
+            if (pT->hashNext == 0)
+            {
+                return pRes;
+            }
+            else
+            {
+                pT = pT->hashNext;
+            }
         }
-        i++;
-    }
 
-    return pRes;
+        return pT;
 }
+
+tNODE *pRoot;
 
 int main()
 {
     int i, j;
-    int done = 0;
     int nodeCnt, node1, node2;
     int NC;
-    int curNodeCnt;
     tNODE *pT, *pT1, *pT2;
-    int temp;
     int nodeNum;
     int unReachNodes;
     int caseID = 1;
+    int reachNodes;
+    int rem;
+#ifndef ONLINE_JUDGE
+    int setCnt;
+#endif
 
 #ifndef ONLINE_JUDGE
     freopen("input_p336.txt", "r", stdin);
 #endif
 
+#ifndef ONLINE_JUDGE
+    setCnt = 0;
+#endif
+
+    pRoot = &nodes[0];
     while (1)
     {
-        //reset connections
-        for (i = 0; i < MAX_NODES; i++)
-        {
-            nodes[i].id = -1;
-            nodes[i].cntLink = 0;
-        }
 
+        //reset connections
         curNodeCnt = 0;
+
+        for (i = 0; i < PRIME; i++)
+        {
+            searchQue[i] = 0;
+        }
 
         scanf("%d", &NC);
 
         if (NC == 0)
             break;
 
+        scanf("%d", &node1);
+        rem = node1 % PRIME;
+        pT1 = &nodes[0];
+        pT1->id = node1;
+        pT1->cntLink = 0;
+        pT1->hashNext = 0;
+        curNodeCnt++;
+        searchQue[rem] = pT1;
+
+        scanf("%d", &node2);
+
+        if (node1 != node2)
+        {
+            pT2 = &nodes[1];
+            pT2->id = node2;
+            pT2->hashNext = 0;
+            curNodeCnt++;
+
+            rem = node2 % PRIME;
+            searchQue[rem] = pT2;
+
+            pT1->links[0] = pT2;
+            pT1->cntLink = 1;
+
+            //register second node
+            pT2->links[0] = pT1;
+            pT2->cntLink = 1;
+        }
+
         //read connections
-        for (i = 0; i < NC; i++)
+        for (i = 1; i < NC; i++)
         {
             scanf("%d", &node1);
             scanf("%d", &node2);
 
-            //register first node
-            pT = searchNode(node1);
-            pT->links[pT->cntLink] = searchNode(node2);
-            pT->cntLink++;
+            if (node1 != node2)
+            {
+                //register first node
+                pT1 = searchNode(node1);
+                pT2 = searchNode(node2);
+                pT1->links[pT1->cntLink] = pT2;
+                pT1->cntLink++;
 
-            //register second node
-            pT = searchNode(node2);
-            pT->links[pT->cntLink] = searchNode(node1);
-            pT->cntLink++;
+                //register second node
+                pT2->links[pT2->cntLink] = pT1;
+                pT2->cntLink++;
+            }
+            else
+            {
+                pT1 = searchNode(node1);
+            }
         }
 
         while (1)
         {
-
             int nID, tCnt;
+
+            reachNodes = 0;
 
             scanf("%d", &nID);
             scanf("%d", &tCnt);
@@ -179,34 +252,44 @@ int main()
             }
 
             initQ();
-            if (searchNodeForPush(nID))
-                pushQ(tCnt, searchNodeForPush(nID));
-            while ((pT = popQ()) != 0)
+            if (pT = searchNodeForPush(nID))
             {
-                if (pT->ticks > 0)
+                reachNodes++;
+                pT->color = tCnt;
+                *pQW = pT;
+                pQW++;
+            }
+            while (pT = popQ())
+            {
+                if (pT->color > 0)
                 {
                     for (j = 0; j < pT->cntLink; j++)
                     {
-                        pushQ(pT->ticks - 1, searchNodeForPush(pT->links[j]->id));
+                        pT1 = searchNodeForPush(pT->links[j]->id);
+                        if (pT1->color == WHITE)
+                        {
+                            reachNodes++;
+                            pT1->color = pT->color - 1;
+                            *pQW = pT1;
+                            pQW++;
+                        }
                     }
+                }
+                else
+                {
+                    break;
                 }
             }
 
             //count nodes not reachable
-            unReachNodes = 0;
-            i = 0;
-            while ((nodes[i].id != -1) && (i < MAX_NODES))
-            {
-                if (nodes[i].ticks < 0)
-                {
-                    unReachNodes++;
-                }
-                i++;
-            }
+            unReachNodes = curNodeCnt - reachNodes;
 
             printf("Case %d: %d nodes not reachable from node %d with TTL = %d.\n", caseID, unReachNodes, nID, tCnt);
             caseID++;
         }
+#ifndef ONLINE_JUDGE
+        setCnt++;
+#endif
     }
 
     return 0;

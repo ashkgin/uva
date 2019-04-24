@@ -15,16 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\bfs\p336\cp336.c">
+    <ClCompile Include="..\..\p11849\p11849.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="output.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="input_p336.txt">
-      <Filter>Resource Files</Filter>
+    <Text Include="input_p11849.txt">
+      <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>
 </Project>

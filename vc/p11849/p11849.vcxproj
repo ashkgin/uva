@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{3E695CB7-AD24-4CA0-AA88-B95EDF5DF613}</ProjectGuid>
-    <RootNamespace>p336</RootNamespace>
+    <ProjectGuid>{C855B3DF-294C-4CC2-B072-A0B2467DE170}</ProjectGuid>
+    <RootNamespace>p11849</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -77,9 +77,6 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -118,11 +115,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\bfs\p336\cp336.c" />
+    <ClCompile Include="..\..\p11849\p11849.c" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="input_p336.txt" />
-    <Text Include="output.txt" />
+    <Text Include="input_p11849.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
