@@ -23,5 +23,8 @@
     <Text Include="input_p11849.txt">
       <Filter>Source Files</Filter>
     </Text>
+    <Text Include="output.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
