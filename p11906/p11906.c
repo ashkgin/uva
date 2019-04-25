@@ -46,7 +46,6 @@ typedef struct NODE {
 }tNODE;
 
 tNODE nodes[MAX_C][MAX_R];
-int cords[8][2];
 int distinctJump;
 
 int cordExist(int sx, int sy, int ex, int ey)
@@ -84,7 +83,7 @@ void jumpAndSearch(int x, int y, int (*cords)[2])
 
     if (nodes[y][x].color != WHITE)
     {
-        return 0;
+        return;
     }
 
     nodes[y][x].color = GRAY;
@@ -124,9 +123,7 @@ void jumpAndSearch(int x, int y, int (*cords)[2])
 
 int main()
 {
-    int i, j, x, y, xNew, yNew;
-    tNODE *pT;
-    int isBomb;
+    int i, x, y, xNew, yNew;
 
     int tCnt, testCases;
     int cJump, rJump;       //knight max jump size in number of columns and rows
@@ -134,6 +131,7 @@ int main()
     int wCnt;               //water grid counter
     int cnt;
     int caseID;
+    int cords[8][2];
 
 #ifndef ONLINE_JUDGE
     freopen("input_p11906.txt", "r", stdin);
