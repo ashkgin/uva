@@ -47,10 +47,84 @@ typedef struct NODE {
 
 tNODE nodes[MAX_C][MAX_R];
 int cords[8][2];
+int distinctJump;
+
+int cordExist(int sx, int sy, int ex, int ey)
+{
+    int result = 0;
+    int x, y;
+
+    x = sx + ex;
+    y = sy + ey;
+
+    if ((x < cols) && (y < rows) && (x >= 0) && (y >= 0) && (nodes[y][x].isBomb==0))
+    {
+        result = 1;
+    }
+
+    return result;
+}
+
+int cordExistNew(int x, int y)
+{
+    int result = 0;
+
+    if ((x < cols) && (y < rows) && (x >= 0) && (y >= 0) && (nodes[y][x].isBomb == 0))
+    {
+        result = 1;
+    }
+
+    return result;
+}
+
+void jumpAndSearch(int x, int y, int (*cords)[2])
+{
+    int cnt, i;
+    int xNew, yNew;
+
+    if (nodes[y][x].color != WHITE)
+    {
+        return 0;
+    }
+
+    nodes[y][x].color = GRAY;
+
+    cnt = 0;
+
+    for (i = 0; i < distinctJump; i++)
+    {
+        xNew = x + cords[i][0];
+        yNew = y + cords[i][1];
+        if (cordExistNew(xNew, yNew))
+        {
+            cnt++;
+            if (nodes[yNew][xNew].color == WHITE)
+            {
+                jumpAndSearch(xNew, yNew, cords);
+                nodes[y][x].evenCnt += nodes[yNew][xNew].evenCnt;
+                nodes[y][x].oddCnt += nodes[yNew][xNew].oddCnt;
+            }
+        }
+    }
+
+    if (cnt % 2)
+    {
+        nodes[y][x].even = 0;
+        nodes[y][x].oddCnt++;
+    }
+    else
+    {
+        nodes[y][x].even = 1;
+        nodes[y][x].evenCnt++;
+    }
+
+    nodes[y][x].color = BLACK;
+
+}
 
 int main()
 {
-    int i, j, x, y, sx, sy;
+    int i, j, x, y, xNew, yNew;
     tNODE *pT;
     int isBomb;
 
@@ -58,16 +132,20 @@ int main()
     int cJump, rJump;       //knight max jump size in number of columns and rows
     int wGrids;             //water grid counts
     int wCnt;               //water grid counter
+    int cnt;
+    int caseID;
 
 #ifndef ONLINE_JUDGE
-    freopen("input_p314.txt", "r", stdin);
+    freopen("input_p11906.txt", "r", stdin);
 #endif
     scanf("%d", &testCases);
 
-    for (tCnt = 1; tCnt < testCases; tCnt++)
+    caseID = 0;
+
+    for (tCnt = 0; tCnt < testCases; tCnt++)
     {
-        scanf("%d", &rows);
         scanf("%d", &cols);
+        scanf("%d", &rows);
 
         scanf("%d", &cJump);
         scanf("%d", &rJump);
@@ -97,37 +175,119 @@ int main()
             nodes[y][x].isBomb = 1;
         }
 
-        cords[0][0] = rJump;
-        cords[0][1] = cJump;
-
-        cords[1][0] = rJump;
-        cords[1][1] = -cJump;
-
-        cords[2][0] = cJump;
-        cords[2][1] = rJump;
-
-        cords[3][0] = cJump;
-        cords[3][1] = -rJump;
-
-        cords[4][0] = -rJump;
-        cords[4][1] = cJump;
-
-        cords[5][0] = -rJump;
-        cords[5][1] = -cJump;
-
-        cords[6][0] = -cJump;
-        cords[6][1] = rJump;
-
-        cords[7][0] = -cJump;
-        cords[7][1] = -rJump;
-
-        for (i = 0; i < 8; i++)
+        if (rJump!=cJump && rJump!=0 && cJump!=0)
         {
+            distinctJump = 8;
+            cords[0][0] = rJump;
+            cords[0][1] = cJump;
 
+            cords[1][0] = rJump;
+            cords[1][1] = -cJump;
+
+            cords[2][0] = cJump;
+            cords[2][1] = rJump;
+
+            cords[3][0] = cJump;
+            cords[3][1] = -rJump;
+
+            cords[4][0] = -rJump;
+            cords[4][1] = cJump;
+
+            cords[5][0] = -rJump;
+            cords[5][1] = -cJump;
+
+            cords[6][0] = -cJump;
+            cords[6][1] = rJump;
+
+            cords[7][0] = -cJump;
+            cords[7][1] = -rJump;
+        }
+        else if (rJump == cJump)
+        {
+            distinctJump = 4;
+            cords[0][0] = rJump;
+            cords[0][1] = cJump;
+
+            cords[1][0] = rJump;
+            cords[1][1] = -cJump;
+
+            cords[2][0] = -rJump;
+            cords[2][1] = cJump;
+
+            cords[3][0] = -rJump;
+            cords[3][1] = -cJump;
+        }
+        else if (rJump == 0)
+        {
+            distinctJump = 4;
+            cords[0][0] = rJump;
+            cords[0][1] = cJump;
+
+            cords[1][0] = rJump;
+            cords[1][1] = -cJump;
+
+            cords[2][0] = cJump;
+            cords[2][1] = rJump;
+
+            cords[3][0] = -cJump;
+            cords[3][1] = rJump;
+        }
+        else
+        {
+            distinctJump = 4;
+            cords[0][0] = rJump;
+            cords[0][1] = cJump;
+
+            cords[1][0] = -rJump;
+            cords[1][1] = cJump;
+
+            cords[2][0] = cJump;
+            cords[2][1] = rJump;
+
+            cords[3][0] = cJump;
+            cords[3][1] = -rJump;
         }
 
 
-        printf("%d\n", nodes[0][0].evenCnt, nodes[0][0].oddCnt);
+
+        cnt = 0;
+        x = 0;
+        y = 0;
+        nodes[y][x].color = GRAY;
+        for (i = 0; i < distinctJump; i++)
+        {
+            xNew = x + cords[i][0];
+            yNew = y + cords[i][1];
+            if (cordExistNew(xNew, yNew))
+            {
+                cnt++;
+                if (nodes[yNew][xNew].color == WHITE)
+                {
+                    jumpAndSearch(xNew, yNew, cords);
+                    nodes[y][x].evenCnt += nodes[yNew][xNew].evenCnt;
+                    nodes[y][x].oddCnt += nodes[yNew][xNew].oddCnt;
+                }
+            }
+        }
+
+        if (cnt % 2)
+        {
+            nodes[y][x].even = 0;
+            nodes[y][x].oddCnt++;
+        }
+        else
+        {
+            nodes[y][x].even = 1;
+            nodes[y][x].evenCnt++;
+        }
+
+
+
+        nodes[y][x].color = BLACK;
+
+        caseID++;
+
+        printf("Case %d: %d %d\n", caseID, nodes[0][0].evenCnt, nodes[0][0].oddCnt);
     }
 
     return 0;
