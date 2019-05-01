@@ -40,7 +40,7 @@ int findNode(int yTemp, int idx)
     for (i = 1; i <= depth; i++)
     {
         nodeIdx = idx >> i;
-        if (pRoot[nodeIdx].YREx >= yTemp)
+        if (pRoot[nodeIdx].YLEx <= yTemp)
         {
             break;
         }
@@ -48,13 +48,13 @@ int findNode(int yTemp, int idx)
 
     for (; i > 0; --i)
     {
-        if (yTemp >= pRoot[(nodeIdx << 1) + 1].YLEx)
+        if (yTemp < pRoot[(nodeIdx << 1) + 1].YLEx)
         {
-            nodeIdx = (nodeIdx << 1) + 1;
+            nodeIdx = (nodeIdx << 1);
         }
         else
         {
-            nodeIdx = (nodeIdx << 1);
+            nodeIdx = (nodeIdx << 1)+1;
         }
     }
 
@@ -66,6 +66,7 @@ int main()
     int res = 0;
     int nYears, nPopes, year, yMax, yTemp;
     int i, j, idx, nodeCnt;
+    int temp1, temp2;
     tNODE *pMid, *pTemp;
     int layerIdx;
     int maxPopes, startYear, endYear;
@@ -132,10 +133,12 @@ int main()
         pRoot = pMid - (1 << depth);
 
         //set first parent level
-        for (i = 0; i < (nodeCnt >> 1); i++)
+        temp1 = nodeCnt >> 1;
+        temp2 = nodeCntMax >> 1;
+        for (i = 0; i < temp1; i++)
         {
-            pRoot[(nodeCntMax >> 1) + i].YLEx = pRoot[nodeCntMax + 2 * i].YLEx;
-            pRoot[(nodeCntMax >> 1) + i].YREx = pRoot[nodeCntMax + 2 * i + 1].YLEx;
+            pRoot[temp2 + i].YLEx = pRoot[nodeCntMax + 2 * i].YLEx;
+            pRoot[temp2 + i].YREx = pRoot[nodeCntMax + 2 * i + 1].YLEx;
         }
 
         //set rest of the tree
@@ -150,30 +153,31 @@ int main()
         }
 
         //first search
-        i = 0;
-        yTemp = pMid[i].YLEx + nYears - 1;
 
-        //find node with year yTemp
-        idx = findNode(yTemp, nodeCntMax);
-
-        maxPopes = pRoot[idx].popNum;
-        startYear = pRoot[nodeCntMax + i].YLEx;
-        endYear = pRoot[idx].YLEx;
-
-        if (pMid->popNum)
+        for (i = 0; i < nodeCnt; i++)
+        {
+            if (pMid[i].YLEx > nYears)
+            {
+                break;
+            }
+        }
+        i--;
+        maxPopes = pMid[i].popNum;
+        startYear = pMid[0].YLEx;
+        endYear = pMid[i].YLEx;
 
             //complete search
-            for (i = 1; i < nodeCnt; i++)
+            for (; i < nodeCnt; i++)
             {
-                yTemp = pMid[i].YLEx + nYears - 1;
+                yTemp = pMid[i].YLEx - nYears;
                 idx = findNode(yTemp, nodeCntMax + i);
 
                 //check max
-                if (maxPopes < (pRoot[idx].popNum - pRoot[nodeCntMax + i - 1].popNum))
+                if (maxPopes < (pMid[i].popNum - pRoot[idx].popNum))
                 {
-                    maxPopes = (pRoot[idx].popNum - pRoot[nodeCntMax + i - 1].popNum);
-                    startYear = pRoot[nodeCntMax + i].YLEx;
-                    endYear = pRoot[idx].YLEx;
+                    maxPopes = (pMid[i].popNum - pRoot[idx].popNum);
+                    startYear = pRoot[idx+1].YLEx;
+                    endYear = pMid[i].YLEx;
                 }
             }
 
